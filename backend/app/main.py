@@ -1,10 +1,13 @@
 from __future__ import annotations
+from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from dotenv import load_dotenv
 from .domain import generate, discover, public_evidence, reply, timeline, verdict, LOCATIONS, MOTIVES
 from .integrations import unavailable
 
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 app = FastAPI(title="MysteryBox API", version="0.1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"], allow_methods=["*"], allow_headers=["*"])
 STORE = {}

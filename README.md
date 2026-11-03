@@ -17,14 +17,14 @@ Gnani Prisma and Timbre endpoints are not guessed. `POST /api/voice/transcribe` 
 
 ## Run locally
 
-Requires Python 3.10+ and Node 20+.
+Requires Python 3.10+ and Node 20+. On Windows, use a real Python installation rather than the Microsoft Store `python`/`py` aliases. Python 3.12–3.14 is the most conservative choice; this repository also runs on the existing Python 3.15 environment after the `uvicorn[standard]` extra was removed.
 
 ```powershell
 cd backend
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+# Replace this path with your actual Python executable if needed.
+& "C:\msys64\ucrt64\bin\python.exe" -m venv .venv
+& .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+& .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
 ```
 
 In another terminal:
@@ -37,6 +37,14 @@ npm run dev
 
 Open the Vite URL (normally `http://localhost:5173`). The OpenAPI page is at `http://localhost:8000/docs`.
 
+Or, after installing both dependency sets once, launch them together from the repository root:
+
+```powershell
+.\start-dev.ps1
+```
+
+The Vite development server proxies `/api` to FastAPI, so a local game uses one browser origin and no longer depends on browser CORS behavior. If the backend is stopped, the game now reports that explicitly instead of the unhelpful browser message “Failed to fetch”.
+
 ## Test
 
 ```powershell
@@ -46,7 +54,11 @@ python -m pytest -q
 
 ## Environment
 
-Copy `.env.example` to `.env`; do not expose any API key to the frontend. `GNANI_API_BASE_URL` and product keys are reserved for the verified official API contract.
+Copy the repository-root `.env.example` to the repository-root `.env`; do not expose any API key to the frontend. `GNANI_API_BASE_URL` and product keys are reserved for the verified official API contract.
+
+### Optional grounded dialogue with Groq
+
+Set `MYSTERYBOX_LLM_PROVIDER=groq` and add a server-side `GROQ_API_KEY` to enable the Groq adapter. It uses the OpenAI-compatible chat-completions endpoint and defaults to `llama-3.3-70b-versatile`. The LLM only rephrases a response already selected by the deterministic engine; it cannot choose the culprit, create evidence, or change the timeline. With no key or a failed provider call, the tested deterministic dialogue remains in use.
 
 ## Demo path
 

@@ -124,6 +124,10 @@ def reply(case: Investigation, character: str, message: str, evidence_id: str | 
     else:
         text = {"mira": "Be exact with your question. Assumptions are how investigations fail.", "aarav": "I already told security what I saw. The storm made everyone jumpy.", "vikram": "The logs are more reliable than memory tonight. Start there.", "elena": "I can help with facts, Detective. I won't decorate them for you."}[character]
         intent = "guarded_response"
+    # The configured LLM can polish this fixed sentence only. Canonical game
+    # state remains owned by the deterministic engine above.
+    from .llm_provider import polish_dialogue
+    text = polish_dialogue(character_name=CHARACTERS[character]["name"], speech_style=CHARACTERS[character]["style"], player_message=message, canonical_response=text)
     case.history.setdefault(character, []).append({"player": message, "character": text})
     return {"dialogue": text, "intent": intent, "mentioned_topics": ["blackout"], "possible_followup_topics": ["access log", "timeline"], "mock_voice": True}
 
